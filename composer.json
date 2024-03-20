@@ -1,0 +1,19 @@
+{
+    "name": "khelechy/argus-php",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Khelechy\\Argus\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "khelechy",
+            "email": "onyekwerekelechimac@gmail.com"
+        }
+    ],
+    "require": {},
+    "description": "This is the official PHP library for the ARGUS Engine, this library helps PHP developers and applications seamlessly integrate to the ARGUS Engine, authentication and event listening."
+}
