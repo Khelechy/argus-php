@@ -12,35 +12,34 @@ class Argus{
     private readonly string $host;
     private readonly int $port;
 
-    private $socket = null;
+    private ?\Socket $socket = null;
 
-    public function __construct($username, $password, $host = '', $port = 0){
+
+    public function __construct($username = '', $password = '', $host = '', $port = 0){
         $this->username = $username ?? '';
         $this->password = $password ?? '';
-        $this->host = $host ?? '127.0.0.1';
+        $this->host = $host == '' ? '127.0.0.1' : $host;
         $this->port = $port == 0 ? 1337 : $port;
     }
 
     public function connect(){
         try{
             
-            $this->socket = socket_create(AF_INET, SOCK_STREAM, 0);
-            socket_connect($this->socket, $this->host, $this->port);
+            $this->socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+            socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
             
             $this->sendAuthData($this->socket, $this->username, $this->password);
 
             while(true){
-                $data = socket_read($this->socket, 1024);
+               $data = socket_read($this->socket, 1024) or die("Connection dropped from Argus server, try reconnecting\n");
 
-               if($data !== ''){
+               $isJson = Helper::isJsonString($data);
 
-                    $isJson = Helper::isJsonString($data);
-
-                    if($isJson){
-                        // Return Json decoded Argus Event
-                    }else{
-                        echo "Received: $data\n";
-                    }
+               if($isJson){
+                   // Return Json decoded Argus Event
+                   echo $data;
+               }else{
+                   echo "Received: $data\n";
                }
     
             }
