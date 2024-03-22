@@ -3,7 +3,9 @@
 namespace Khelechy\Argus;
 
 use Khelechy\Argus\Helpers\Helper;
+use Khelechy\Argus\Models\ArgusEvent;
 use Khelechy\Argus\Exceptions\ArgusException;
+use Khelechy\Argus\Handlers\EventBus;
 
 class Argus{
 
@@ -11,6 +13,8 @@ class Argus{
     private readonly string $password;
     private readonly string $host;
     private readonly int $port;
+
+    private $eventBus;
 
     private ?\Socket $socket = null;
 
@@ -20,6 +24,8 @@ class Argus{
         $this->password = $password ?? '';
         $this->host = $host == '' ? '127.0.0.1' : $host;
         $this->port = $port == 0 ? 1337 : $port;
+
+        $this-> eventBus = new EventBus();
     }
 
     public function connect(){
@@ -37,10 +43,10 @@ class Argus{
 
                if($isJson){
                    // Return Json decoded Argus Event
-                   echo $data;
-               }else{
+                   $this->publishArgusEvent($data);
+                }else{
                    echo "Received: $data\n";
-               }
+                }
     
             }
             
@@ -51,6 +57,17 @@ class Argus{
             socket_close($this->socket);
             throw new ArgusException($exp);
         }
+    }
+
+    private function publishArgusEvent($data){
+        $argusEvent = new ArgusEvent();
+        foreach ($data as $key => $value) $argusEvent->{$key} = $value;
+
+        $this->eventBus->publish($argusEvent);
+    }
+
+    public function subscribe($subscriber, string $methodName){
+        $this->eventBus->subscribe($subscriber, $methodName);
     }
 
     private function sendAuthData($socket, $username, $password){
