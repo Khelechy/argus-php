@@ -6,8 +6,6 @@ define('ARGUSEVENTNAME', 'argus.event.received', false);
 
 class EventBus{
 
-    const ARGUSEVENTNAME = 'argus.event.received';
-
     private $subscribers = [];
 
     public function subscribe($subscriber, string $methodName) {
