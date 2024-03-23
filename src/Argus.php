@@ -60,9 +60,7 @@ class Argus{
     }
 
     private function publishArgusEvent($data){
-        $argusEvent = new ArgusEvent();
-        foreach ($data as $key => $value) $argusEvent->{$key} = $value;
-
+        $argusEvent = new ArgusEvent($data);
         $this->eventBus->publish($argusEvent);
     }
 
